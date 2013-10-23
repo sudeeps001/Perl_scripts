@@ -22,15 +22,15 @@ unless(defined($input)){
 }
 unless(defined($start)){
 	$start=1;
-	print "\t parameter -b was not defined, start inflation used: 1 (default)\n"
+	warn "\t parameter -b was not defined, start inflation used: 1 (default)\n"
 }
 unless(defined($end)){
 	$end = 3;
-	print "\t parameter -e was not defined, end inflation used: 3 (default)\n"
+	warn "\t parameter -e was not defined, end inflation used: 3 (default)\n"
 }
 unless(defined($loop)){
 	$loop = 10000;
-	print "\t parameter -l was not defined, number of loops 10000 (default)\n"
+	warn "\t parameter -l was not defined, number of loops 10000 (default)\n"
 }
 
 # run mcl for a given file for inflation values
@@ -55,8 +55,8 @@ getMCLstat();
 ################## SUB ROUTINES ###########################################
 
 sub help_message{
-	print "\n\nError! run file mci/abc format not given!\n";
-	print "Call runMCL.pl -f input mci/abc -b begin inflation (optional, default 1) -e end inflation (optional, default 3) -l loop number (optional, default 10000)\n\n";
+	warn "\n\nError! run file mci/abc format not given!\n";
+	warn "Call runMCL.pl -f input mci/abc -b begin inflation (optional, default 1) -e end inflation (optional, default 3) -l loop number (optional, default 10000)\n\n";
 	die();
 }
 
@@ -74,6 +74,7 @@ sub runMCL_abc{
 	$tabFile=~s/\..*$/\.tab/gi;
 	system("mcxload","-abc","$input","--stream-mirror",
 	"-write-tab","$tabFile","-o","$mciFile");
+	warn "\t files $mciFile and $tabFile genrated in current working directory\n\n";
 	$input=$mciFile;
 	for(my $i=$start;$i<=$end;$i=$i+0.1){	
 		system("mcl","$input","-I","$i","-l","$loop");
