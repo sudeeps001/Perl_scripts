@@ -14,23 +14,23 @@ use Getopt::Long;
 my $input;
 my $start;
 my $end;
-my $loop;
+my $thread;
 # some inputs 
-GetOptions('f=s'=>\$input,'b=f'=>\$start,'e=f'=>\$end,'l=i'=>\$loop);
+GetOptions('f=s'=>\$input,'b=f'=>\$start,'e=f'=>\$end,'thread=i'=>\$thread);
 unless(defined($input)){
 	help_message();
 }
 unless(defined($start)){
 	$start=1;
-	warn "\t parameter -b was not defined, start inflation used: 1 (default)\n"
+	print "\t parameter -b was not defined, start inflation used: 1 (default)\n"
 }
 unless(defined($end)){
 	$end = 3;
-	warn "\t parameter -e was not defined, end inflation used: 3 (default)\n"
+	print "\t parameter -e was not defined, end inflation used: 3 (default)\n"
 }
-unless(defined($loop)){
-	$loop = 10000;
-	warn "\t parameter -l was not defined, number of loops 10000 (default)\n"
+unless(defined($thread)){
+	$thread= 1;
+	print "\t parameter -thread was not defined, number of threads: 1 (default)\n"
 }
 
 # run mcl for a given file for inflation values
@@ -55,14 +55,14 @@ getMCLstat();
 ################## SUB ROUTINES ###########################################
 
 sub help_message{
-	warn "\n\nError! run file mci/abc format not given!\n";
-	warn "Call runMCL.pl -f input mci/abc -b begin inflation (optional, default 1) -e end inflation (optional, default 3) -l loop number (optional, default 10000)\n\n";
+	print "\n\nError! run file mci/abc format not given!\n";
+	print "Call runMCL.pl -f input mci/abc -b begin inflation (optional, default 1) -e end inflation (optional, default 3) -thread number of threads (optional, default 1)\n\n";
 	die();
 }
 
 sub runMCL_mci{
 	for(my $i=$start;$i<=$end;$i=$i+0.1){	
-		system("mcl","$input","-I","$i");
+		system("mcl","$input","-I","$i","-te","$thread");
 	}
 	$mciFile= $input;
 }
@@ -74,10 +74,10 @@ sub runMCL_abc{
 	$tabFile=~s/\..*$/\.tab/gi;
 	system("mcxload","-abc","$input","--stream-mirror",
 	"-write-tab","$tabFile","-o","$mciFile");
-	warn "\t files $mciFile and $tabFile genrated in current working directory\n\n";
 	$input=$mciFile;
+	warn "\t files $mciFile and $tabFile genrated in current working directory\n\n";
 	for(my $i=$start;$i<=$end;$i=$i+0.1){	
-		system("mcl","$input","-I","$i","-l","$loop");
+		system("mcl","$input","-I","$i","-te","$thread");
 	}
 #	if running mcl with abc file clm needs .mci for generating statistics
 	
@@ -130,8 +130,3 @@ sub getMCLstat{
 	}
 	$out->close();
 }
-
-
-
-
-
